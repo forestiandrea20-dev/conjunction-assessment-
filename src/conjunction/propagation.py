@@ -16,6 +16,9 @@ from sgp4.api import Satrec
 from datetime import datetime
 from sgp4.api import jday
 
+#third 
+import numpy as np
+
 # Function - read OMM csv
 def load_omm_csv(path):
     """Read an OMM CSV file and return {object name: Satrec}."""
@@ -45,3 +48,22 @@ def iso_to_jd(iso: str) -> tuple[float, float]:
     jd, fr = jday(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second+dt.microsecond*1e-6)
 
     return jd, fr
+
+def propagate(sat, jd, fr):
+    """Propagate a Satrec to the given split Julian dates.
+
+    Parameters
+    ----------
+    sat : Satrec
+    jd, fr : array_like
+        Integer and fractional parts of the Julian dates (UTC).
+
+    Returns
+    -------
+    r, v : ndarray, shape (N, 3)
+        Position [km] and velocity [km/s] in the TEME frame.
+    """
+    err, r, v = sat.sgp4_array(np.asarray(jd, dtype=float), np.asarray(fr, dtype=float))
+    if np.any(err != 0):
+        raise RuntimeError(f"SGP4 error codes: {np.unique(err)}")
+    return r, v
