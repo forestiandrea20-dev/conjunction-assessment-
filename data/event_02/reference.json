@@ -1,0 +1,9 @@
+{
+    "source": "CelesTrak SOCRATES Plus, retrieved 2026-11-08",
+    "primary": {"norad_id": 66846, "name": "STARLINK-36055"},
+    "secondary": {"norad_id": 31630, "name": "FENGYUN 1C DEB"},
+    "tca_utc": "2026-11-08T01:29:48.065",
+    "min_range_km": 0.176,
+    "relative_speed_km_s": 8.871,
+    "max_probability": 3.599e-3
+}
