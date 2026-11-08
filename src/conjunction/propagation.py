@@ -2,6 +2,7 @@
 # SOCRATES—Satellite Orbital Conjunction Reports Assessing Threatening Encounters in Space
 
 # Libreries Import
+# First function 
 # sgp4
 from sgp4 import omm
 # sgp4.omm - Support for Orbit Mean-Elements Message (OMM) orbital elements format.
@@ -11,6 +12,9 @@ from sgp4 import omm
 from sgp4.api import Satrec
 # help: python -c "from sgp4.api import Satrec; help(Satrec)"
 
+# Second function 
+from datetime import datetime
+from sgp4.api import jday
 
 # Function - read OMM csv
 def load_omm_csv(path):
@@ -28,3 +32,16 @@ if __name__ == "__main__":
     sats = load_omm_csv("data/event_01/gp_data.csv")
     print(sats.keys())
 
+# Function - from ISO string to (jd, fr) 
+def iso_to_jd(iso: str) -> tuple[float, float]:
+    """Convert an ISO 8601 UTC string to a split Julian date (jd, fr) for SGP4."""
+    # example of date "2026-11-09T08:56:34.405"
+    dt = datetime.fromisoformat(iso) #naive -> no time zone 
+
+    # NOTE: datetime splits the time into 7 fields (seconds and microseconds are separate),
+    # while jday() takes 6 arguments, so microseconds are folded into fractional seconds
+    # # to preserve millisecond precision of the TCA.
+
+    jd, fr = jday(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second+dt.microsecond*1e-6)
+
+    return jd, fr
