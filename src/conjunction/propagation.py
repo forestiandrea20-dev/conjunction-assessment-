@@ -63,7 +63,9 @@ def propagate(sat, jd, fr):
     r, v : ndarray, shape (N, 3)
         Position [km] and velocity [km/s] in the TEME frame.
     """
-    err, r, v = sat.sgp4_array(np.asarray(jd, dtype=float), np.asarray(fr, dtype=float))
+    err, r, v = sat.sgp4_array(np.atleast_1d(jd).astype(float), np.atleast_1d(fr).astype(float))
+    
     if np.any(err != 0):
         raise RuntimeError(f"SGP4 error codes: {np.unique(err)}")
+
     return r, v
