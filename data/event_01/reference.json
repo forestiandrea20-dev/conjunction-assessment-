@@ -1,0 +1,9 @@
+{
+  "source": "CelesTrak SOCRATES Plus, retrieved 2026-11-08",
+  "primary": {"norad_id": 58491, "name": "STARLINK-30953"},
+  "secondary": {"norad_id": 64653, "name": "CZ-6A DEB"},
+  "tca_utc": "2026-11-09T08:56:34.405",
+  "min_range_km": 0.111,
+  "relative_speed_km_s": 10.314,
+  "max_probability": 8.220e-3
+}
