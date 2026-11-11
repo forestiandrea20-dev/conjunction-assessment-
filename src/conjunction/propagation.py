@@ -19,6 +19,9 @@ from sgp4.api import jday
 #third 
 import numpy as np
 
+import json
+from pathlib import Path
+
 # Function - read OMM csv
 def load_omm_csv(path):
     """Read an OMM CSV file and return {object name: Satrec}."""
@@ -29,6 +32,14 @@ def load_omm_csv(path):
             omm.initialize(sat, fields)
             sats[fields["OBJECT_NAME"]] = sat
     return sats
+
+def load_event(event_dir: Path) -> tuple[Satrec, Satrec, dict]:
+    with open(event_dir / "reference.json") as f:
+        reference = json.load(f)
+    sats = load_omm_csv(event_dir / "gp_data.csv")
+    primary = sats[reference["primary"]["name"]]
+    secondary = sats[reference["secondary"]["name"]]
+    return primary, secondary, reference
 
 
 if __name__ == "__main__":
