@@ -56,20 +56,44 @@ def refine_tca(primary: Satrec, secondary: Satrec,
         jd = np.array([jd0])
         f_array = range_rate(primary, secondary, jd, fr)
         return f_array[0]
-
     # Zero of r_rel · v_rel inside the bracket = time of closest approach
     t_tca = brentq(range_rate_at, t_start, t_end, xtol=1e-6)
-
+    
     # brentq: Uses the classic Brent’s method to find a root of the function f 
     # on the sign changing interval [a , b].
-
+    
     # Relative state at the refined TCA
     fr_tca = np.array([fr0 + t_tca / 86400.0])
     jd_tca = np.array([jd0])
     pos_p, vel_p = propagate(primary, jd_tca, fr_tca)
     pos_s, vel_s = propagate(secondary, jd_tca, fr_tca)
-
+    
     miss_km = np.linalg.norm(pos_s - pos_p, axis=1)[0]
     speed_km_s = np.linalg.norm(vel_s - vel_p, axis=1)[0]
-
+    
     return float(t_tca), float(miss_km), float(speed_km_s)
+
+
+
+def find_conjunctions(primary: Satrec, secondary: Satrec,
+                      jd0: float, fr0: float, duration_s: float,
+                      threshold_km: float = 5.0,
+                      step_s: float = 60.0) -> list[tuple[float, float, float]]:
+    """Return (t_tca, miss distance [km], relative speed [km/s]) for every
+    close approach below threshold_km within duration_s from (jd0, fr0)."""
+    # 1. Coarse grid: one bracket per local minimum of the distance
+    candidates = find_candidates(primary, secondary, jd0, fr0, duration_s, step_s)
+
+    # 2. Refine each bracket and keep only the close approaches
+    conjunctions = []
+    for t_start, t_end in candidates:
+        t_tca, miss_km, speed_km_s = refine_tca(primary, secondary, jd0, fr0, t_start, t_end)
+        # 3. if the miss distance is below threshold_km, append the
+        #    tuple (t_tca, miss_km, speed_km_s) to conjunctions
+        if miss_km < threshold_km:
+            conjunctions.append((t_tca, miss_km, speed_km_s))
+
+    # 4. return conjunctions
+    return conjunctions
+
+    
